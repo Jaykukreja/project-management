@@ -1,50 +1,60 @@
 const validator=require('validator');
 const isEmpty=require('./is-empty');
 module.exports = function validateProjectinput(data){
-	let errors ={};
+	let errors ={
 
-	data.name=!isEmpty(data.name) ? data.name : '';
-	data.email=!isEmpty(data.email) ? data.email : '';
-	data.password=!isEmpty(data.password) ? data.password : '';
-	data.password2=!isEmpty(data.password2) ? data.password2 : '';
+	};
+	console.log(data.members)
+	const projectFields ={};
 
-	if(!validator.isLength(data.name,{min :2 ,max:30})){
-		errors.name ='Name must be between 2 and 30 characters';
+	//Members - Split into array
+	if(typeof data.members !== 'undefined'){
+        projectFields.members= data.members.split(',');
 	}
+	console.log(projectFields.members)
 
-	if(validator.isEmpty(data.name)){
-		errors.name ='Name is required';
-
-	}
-
-	if(validator.isEmpty(data.email)){
-		errors.email ='Email field is required';
-
-	}
-
-	if(!validator.isEmail(data.email)){
-		errors.email ='Email is invalid';
+	var i;
+    for (i = 0; i < projectFields.members.length; i++) {
+		console.log(projectFields.members[i])
+		if(!validator.isEmail(projectFields.members[i])){
+		errors.members ='members field must have valid Email Ids';
 
 	}
+    }
+	//console.log(data)
+	data.projectName=!isEmpty(data.projectName) ? data.projectName : '';
+	data.description=!isEmpty(data.description) ? data.description : '';
+	//data.members=!isEmpty(data.members) ? data.members : '';
+	data.from=!isEmpty(data.from) ? data.from : '';
+	data.to=!isEmpty(data.to) ? data.to : '';
+	
+	if(!validator.isLength(data.description,{min :2 ,max:60})){
+		console.log("/////")
+		errors.description ='Description must be between 2 and 30 characters';
+	}
 
-	if(validator.isEmpty(data.password)){
-		errors.password ='Password field is required';
+	if(validator.isEmpty(data.projectName)){
+		errors.projectName ='ProjectName is required';
 
 	}
 
-	if(!validator.isLength(data.password,{min:6 ,max:30})){
-		errors.password ='Password must be atleast 6 characters';
+	if(!validator.isEmail(data.guide)){
+		errors.guide ="Guide's Email is invalid";
 
 	}
 
-	if(validator.isEmpty(data.password2)){
-		errors.password2 ='Confirm password field is required';
+	if(validator.isEmpty(data.from)){
+		errors.from ='from field is required';
 	}
 
-	if(!validator.equals(data.password,data.password2)){
-		errors.password2 ='Password must match ';
+	if(validator.isEmpty(data.to)){
+		errors.to ='to field is required';
 	}
+	console.log("4454545545")
+
+	
 	return {
+		
 		errors,
 		isValid :isEmpty(errors) 
 	}

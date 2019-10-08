@@ -5,8 +5,42 @@ const mongoose =require('mongoose');
 const passport =require('passport');
 const jwt =require("jsonwebtoken");
 const keys=require('../../config/keys');
+const nodemailer = require('nodemailer')
+//function for mail
+
+function sendmail(name,subject,html){
+	// var s=tosend
+	 var smtpTransport = nodemailer.createTransport({
+		 service: "gmail",
+		 host: "smtp.gmail.com",
+		 port: 587,
+		 secure:true,
+		 requiresAuth: true,
+	   domains: ["gmail.com", "googlemail.com"],
+		 auth: {
+		   user: "testiotsap@gmail.com",
+		   pass: "dynamo2818"
+		 }
+	   });
 
 
+	   var mailOptions = {
+		 to: name,
+		 subject: subject,
+		 text: '',
+		 html:html
+	   };
+	   //console.log(mailOptions);
+	   smtpTransport.sendMail(mailOptions, function(error, response) {
+		console.log(error)
+		if (error) {
+		   throw error;
+		 } else {
+		   console.log("Message sent: " + response);
+		   //res.send(response);
+		 }
+	   });
+ }
 //load input validation 
 const validateRegisterinput = require('../../validation/register');
 const validateLogininput = require('../../validation/login');
@@ -18,7 +52,7 @@ const User = require("../../model/user");
 router.get('/test',(req,res)=>res.json({msg:"it workss"}));
 
 router.post('/register',(req,res)=>{
-	console.log(req.body)
+	// console.log(req.body)
 	const { errors, isValid } = validateRegisterinput(req.body);
 
 	// // check validation 
@@ -42,20 +76,22 @@ router.post('/register',(req,res)=>{
 				const newUser = new User({
 					name : req.body.name,
 					email : req.body.email,
-					password : req.body.password
-				});
-
+					password : req.body.password,
+					});
+					
 				bcrypt.genSalt(10,(err,salt)=> {
 					bcrypt.hash(newUser.password,salt,(err,hash)=>{
 						if (err) throw err;
 						newUser.password=hash;
 						newUser.save()
 						.then(user=>{
+							var url = "http:192.168.1.18:2000/api/user/verify/"+user._id;
+							sendmail(user.email,'Verify Your Account','<a href='+url+'>Click To verify!</a>')
 							user = {
 								...user,
 								status: true
 							}
-							console.log(user)
+							// console.log(user)
 							return res.json(user)})
 						.catch(err=> console.log(err))
 					})
@@ -64,6 +100,22 @@ router.post('/register',(req,res)=>{
 			}
 		})
 })
+
+
+router.get('/verify/:id',(req,res)=>{
+	User.findOne({_id:req.params.id})
+	 .then(user=>{
+		 if(user){
+			 user.verified = true;
+			 user.save().then(updatedUser =>
+				res.send('Successfully verified')
+			 )
+		 }
+		 else{
+			 res.send("Invaild Request")
+		 }
+	 })
+});
 
 // router.post("/register", (req, res) => {
 //   const errors = {
@@ -190,9 +242,12 @@ router.post('/login',(req,res)=>{
 
 	const email=req.body.email;
 	const password=req.body.password;
+	if(errors.email || errors.password ){
+		return res.json(errors)
+	}
 	console.log("ko")
 	//find user by email
-	User.findOne({email})
+	User.findOne({email:email,verified:true})
 	.then(user => {
 		//check for user
 		if (!user){

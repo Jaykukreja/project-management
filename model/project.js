@@ -15,13 +15,28 @@ const ProjectSchema = new Schema({
         required:true
     },
 
+
     description:{
         type:String
     },
 
-    team:{
+    guide:{
         type:String
     },
+
+    team:[{
+        teamMates:{
+            type : [String],
+        },
+        role:{
+            type:String
+        },
+        date: {
+            type: Date,
+            default: Date.now
+          }
+       
+    }],
 
     members:[
         {
@@ -35,17 +50,15 @@ const ProjectSchema = new Schema({
         //required:true
     },
 
-    // date:[
-    //     {
-    //         from: {
-    //             type: Date,
-    //             required: true
-    //           },
-    //           to: {
-    //             type: Date
-    //           }
-    //     }
-    // ],
+    
+            from: {
+                type: Date,
+                required: true
+              },
+              to: {
+                type: Date
+              },
+    
 
     task:[
         {
@@ -64,13 +77,14 @@ const ProjectSchema = new Schema({
                 type: Date
               },
             assigned:{
-                type: [String]
+                type: String
                 //ref: 'users'
 
             },
             priority:{
                 type:String
             }
+            
         }
     ],
 
