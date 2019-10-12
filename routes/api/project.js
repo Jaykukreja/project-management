@@ -347,7 +347,7 @@ router.post('/addteamMates', passport.authenticate('jwt',{session:false}),
 //     { _id: 1 },
 //     { $addToSet: { colors: "c" } }
 //  )
-//Add Member to project
+//Add Member to project later 
 router.post('/addmember', passport.authenticate('jwt',{session:false}),
 (req,res)=>{
     Project.findOne({_id : req.body.projectId})
@@ -362,13 +362,74 @@ router.post('/addmember', passport.authenticate('jwt',{session:false}),
                 //{ $push: { members: req.body.member } },
                 //{new :true}
             )
-            .then(project => res.json(project));
-            console.log(project)
+            .then(project => {
+                console.log(project)
+                res.json(project)
+            });
+           
         }
 
      })
      .catch(err => res.json(err));
 })
+
+//for checklist teams ka title 
+router.post('/checklist', passport.authenticate('jwt',{session:false}),
+(req,res)=>{
+    Project.findOne({_id :req.body.projectId})//given project id 
+        .then(project => {
+            if(project){
+                res.json(project.task)
+            }
+        })
+});
+
+
+//form subteams
+router.post('/subteams', passport.authenticate('jwt',{session:false}),
+(req,res)=>{
+    console.log(req.body)
+    const subteamsFields={}
+    //Members - Split into array
+    if(typeof req.body.teamMates !== 'undefined')
+    {
+        subteamsFields.teamMates= req.body.teamMates.split(',');
+    }
+    subteamsFields.role=req.body.role
+    Project.findOne({_id :req.body.projectId})//given project id 
+        .then(project => {
+//             console.log(subteamsFields)
+//             // if(project){
+//             //     res.json(project.task)
+//             // }
+//         if(project){
+//             Project.findOneAndUpdate( 
+//                 {user:req.user.id},
+//                 {$set :subteamsFields}, 
+//                 {new :true}
+//             )
+//             .then(user => res.json(user));
+            
+        
+//     }else{
+      
+//  //Save project team mates
+//      new Project(subteamsFields).save().then(Project => res.json({success: true,Project}))
+
+//     }
+
+
+        const newsubteams = {
+        role:req.body.role,
+        teamMates:req.body.teamMates,
+        }
+        //Add to exp array
+        project.team.unshift(newsubteams); //to add in the beginning
+
+        project.save().then(project=> res.json({success:true,project:project}));
+        })
+        .catch(err => res.json(err));
+});
 
 
 //Add milestone
@@ -381,7 +442,7 @@ router.post('/milestone', passport.authenticate('jwt',{session:false}),
                 title :req.body.title,
                 from:req.body.from,
                 to :req.body.to,
-                assigned:req.body.assigned
+                task:req.body.task
             }
             //Add to exp array
             project.milestone.unshift(newMilestone); //to add in the beginning

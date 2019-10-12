@@ -101,9 +101,9 @@ const ProjectSchema = new Schema({
             to: {
                 type: Date
             },
-            assigned:{
+            task:{
                 type: [String]
-                // ref: 'users'
+                //ref: 'project'
 
             }
         }
