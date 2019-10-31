@@ -5,93 +5,101 @@ const Schema = mongoose.Schema;
 //Create project schema
 const ProjectSchema = new Schema({
 
-    user:{
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
     },
 
-    projectName:{
-        type:String,
-        required:true
+    projectName: {
+        type: String,
+        required: true
     },
 
 
-    description:{
-        type:String
+    description: {
+        type: String
     },
 
-    guide:{
-        type:String
+    guide: {
+        type: String
     },
 
-    team:[{
-        teamMates:{
-            type : [String],
-        },
-        role:{
-            type:String
+    team: [{
+        teamMates:
+            [
+                {
+                    email: {
+                        type: String
+                    },
+                    role: {
+                        type: String
+                    }
+                }
+            ],
+        teamName: {
+            type: String
         },
         date: {
             type: Date,
             default: Date.now
-          }
-       
+        }
+
     }],
 
-    members:[
+    members: [
         {
             type: [String]
             // ref: 'users'
-          }
+        }
     ],
-    
-    owner:{
-        type:String,
+
+    owner: {
+        type: String,
         //required:true
     },
 
-    
-            from: {
-                type: Date,
-                required: true
-              },
-              to: {
-                type: Date
-              },
-    
 
-    task:[
+    from: {
+        type: Date,
+        required: true
+    },
+    to: {
+        type: Date
+    },
+
+
+    task: [
         {
-            title:{
-                type:String,
+            title: {
+                type: String,
                 //required:true
             },
-            description:{
-                type:String
+            description: {
+                type: String
             },
             from: {
                 type: Date,
                 //required: true
-              },
+            },
             to: {
                 type: Date
-              },
-            assigned:{
+            },
+            assigned: {
                 type: String
                 //ref: 'users'
 
             },
-            priority:{
-                type:String
+            priority: {
+                type: String
             }
-            
+
         }
     ],
 
-    milestone:[
+    milestone: [
         {
-            title:{
-                type:String,
+            title: {
+                type: String,
                 //required:true
             },
             from: {
@@ -101,7 +109,7 @@ const ProjectSchema = new Schema({
             to: {
                 type: Date
             },
-            task:{
+            task: {
                 type: [String]
                 //ref: 'project'
 
